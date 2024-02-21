@@ -11,7 +11,9 @@ public class Comment {
     private int id;
     @Column(name = "dreb")
     private String describe;
-//    private User user;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "userid")
+    private User user;
 //    private Song song;
 
     public Comment() {
@@ -31,5 +33,13 @@ public class Comment {
 
     public void setDescribe(String describe) {
         this.describe = describe;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

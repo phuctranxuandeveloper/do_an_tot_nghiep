@@ -1,5 +1,6 @@
 package com.phuc158965.do_an_tot_nghiep.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
@@ -16,8 +17,8 @@ public class Account {
     private String password;
     @Column(name = "active")
     private Boolean active;
-    @JsonIgnore
-    @OneToOne(mappedBy = "account", cascade = CascadeType.DETACH)
+    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
+    @JsonBackReference
     private User user;
 
     public Account() {

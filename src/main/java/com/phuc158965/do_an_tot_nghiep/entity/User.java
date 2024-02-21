@@ -1,6 +1,7 @@
 package com.phuc158965.do_an_tot_nghiep.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -22,14 +23,17 @@ public class User {
     private String phone;
     @Column(name = "avatar")
     private String avatar;
-
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "accountid")
+    @JsonManagedReference
     private Account account;
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "userid")
     private List<Playlist> playlists;
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
+    private List<Comment> comments;
 
     public User() {
     }
@@ -96,5 +100,13 @@ public class User {
 
     public void setPlaylists(List<Playlist> playlists) {
         this.playlists = playlists;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 }
