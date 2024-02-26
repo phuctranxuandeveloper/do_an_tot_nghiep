@@ -38,12 +38,12 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void deleteById(Integer id) {
-        User userDelete = userRepository.findUserByUserId(id)
-                        .orElseThrow(() -> new EntityNotFoundException("user not found with id: "+id));
-        if (userDelete.getAccount() != null){
-            accountRepository.delete(userDelete.getAccount());
-            userDelete.setAccount(null);
-        }
+//        User userDelete = userRepository.findUserByUserId(id)
+//                        .orElseThrow(() -> new EntityNotFoundException("user not found with id: "+id));
+//        if (userDelete.getAccount() != null){
+//            accountRepository.delete(userDelete.getAccount());
+//            userDelete.setAccount(null);
+//        }
         userRepository.deleteById(id);
     }
 }

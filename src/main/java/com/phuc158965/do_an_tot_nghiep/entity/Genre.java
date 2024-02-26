@@ -1,5 +1,6 @@
 package com.phuc158965.do_an_tot_nghiep.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -12,6 +13,7 @@ public class Genre {
     private int id;
     @Column(name = "namegenre")
     private String nameGenre;
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY,
             cascade = {CascadeType.DETACH,
                     CascadeType.MERGE,

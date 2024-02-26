@@ -1,7 +1,9 @@
 package com.phuc158965.do_an_tot_nghiep.controller;
 
+import com.phuc158965.do_an_tot_nghiep.dto.AccountDTO;
 import com.phuc158965.do_an_tot_nghiep.entity.Account;
 import com.phuc158965.do_an_tot_nghiep.entity.User;
+import com.phuc158965.do_an_tot_nghiep.mapper.AccountMapper;
 import com.phuc158965.do_an_tot_nghiep.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,13 +27,16 @@ public class AccountController {
     public ResponseEntity<?> getAllAccount(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
-            PagedResourcesAssembler<Account> assembler
+            PagedResourcesAssembler<AccountDTO> assembler
     ){
         Page<Account> accounts = accountService.findAllAccount(page, size);
-        PagedModel<EntityModel<Account>> accountPagedModel = assembler.toModel(accounts, account ->
-                EntityModel.of(account,
-                        WebMvcLinkBuilder.linkTo(methodOn(AccountController.class).getAccountById(account.getId())).withSelfRel(),
-                        WebMvcLinkBuilder.linkTo(methodOn(AccountController.class).getUserByAccountId(account.getId())).withRel("users")));
+        Page<AccountDTO> accountDTOS = accounts.map(accountDTO -> {
+            return AccountMapper.INSTANCE.toAccountDTO(accountDTO);
+        });
+        PagedModel<EntityModel<AccountDTO>> accountPagedModel = assembler.toModel(accountDTOS, accountDTO ->
+                EntityModel.of(accountDTO,
+                        WebMvcLinkBuilder.linkTo(methodOn(AccountController.class).getAccountById(accountDTO.getId())).withSelfRel(),
+                        WebMvcLinkBuilder.linkTo(methodOn(AccountController.class).getUserByAccountId(accountDTO.getId())).withRel("users")));
         return new ResponseEntity<>(accountPagedModel, HttpStatus.OK);
     }
 

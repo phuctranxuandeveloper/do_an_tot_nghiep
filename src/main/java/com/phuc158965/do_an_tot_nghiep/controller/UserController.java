@@ -1,8 +1,10 @@
 package com.phuc158965.do_an_tot_nghiep.controller;
 
+import com.phuc158965.do_an_tot_nghiep.dto.UserDTO;
 import com.phuc158965.do_an_tot_nghiep.entity.Account;
 import com.phuc158965.do_an_tot_nghiep.entity.Playlist;
 import com.phuc158965.do_an_tot_nghiep.entity.User;
+import com.phuc158965.do_an_tot_nghiep.mapper.UserMapper;
 import com.phuc158965.do_an_tot_nghiep.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,21 +31,25 @@ public class UserController {
     public ResponseEntity<?> getAllUser(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
-            PagedResourcesAssembler<User> assembler
+            PagedResourcesAssembler<UserDTO> assembler
     ){
         Page<User> users = userService.findAllUser(page, size);
-        PagedModel<EntityModel<User>> userPagedModel = assembler.toModel(users, user ->
+        Page<UserDTO> userDTOS = users.map(user -> {
+            return UserMapper.INSTANCE.userToUserDTO(user);
+        });
+        PagedModel<EntityModel<UserDTO>> userPagedModel = assembler.toModel(userDTOS, user ->
                 EntityModel.of(user,
-                        WebMvcLinkBuilder.linkTo(methodOn(UserController.class).getUserById(user.getUserId())).withSelfRel(),
-                        WebMvcLinkBuilder.linkTo(methodOn(UserController.class).getAccountByUserId(user.getUserId())).withRel("accounts"),
-                        WebMvcLinkBuilder.linkTo(methodOn(UserController.class).getPlaylistByUserId(user.getUserId())).withRel("playlist")));
+                        WebMvcLinkBuilder.linkTo(methodOn(UserController.class).getUserById(user.getId())).withSelfRel(),
+                        WebMvcLinkBuilder.linkTo(methodOn(UserController.class).getAccountByUserId(user.getId())).withRel("accounts"),
+                        WebMvcLinkBuilder.linkTo(methodOn(UserController.class).getPlaylistByUserId(user.getId())).withRel("playlist")));
         return new ResponseEntity<>(userPagedModel, HttpStatus.OK);
     }
 
     @GetMapping("{id}")
     public ResponseEntity<?> getUserById(@PathVariable Integer id){
         User user = userService.findUserById(id);
-        EntityModel<User> rs = EntityModel.of(user);
+        UserDTO userDTO = UserMapper.INSTANCE.userToUserDTO(user);
+        EntityModel<UserDTO> rs = EntityModel.of(userDTO);
         rs.add(linkTo(UserController.class).slash(id).withSelfRel());
         rs.add(linkTo(methodOn(UserController.class).getAccountByUserId(id)).withRel("accounts"));
         rs.add(linkTo(methodOn(UserController.class).getPlaylistByUserId(id)).withRel("playlists"));
@@ -67,9 +73,35 @@ public class UserController {
 //    Add
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody User user){
-        user.setUserId(0);
-        User userCreated = userService.save(user);
+        User userCreating = new User();
+        userCreating.setUserId(0);
+        userCreating.setFirstName(user.getFirstName());
+        userCreating.setLastName(user.getLastName());
+        userCreating.setPhone(user.getPhone());
+        userCreating.setEmail(user.getEmail());
+        userCreating.setAvatar(user.getAvatar());
+        Account accountUserCreating = new Account();
+        accountUserCreating.setId(0);
+        accountUserCreating.setActive(true);
+        accountUserCreating.setUsername(user.getAccount().getUsername());
+        accountUserCreating.setPassword(user.getAccount().getPassword());
+        userCreating.setAccount(accountUserCreating);
+        User userCreated = userService.save(userCreating);
         return new ResponseEntity<>(userCreated, HttpStatus.CREATED);
+    }
+    @PutMapping("{id}")
+    public ResponseEntity<?> updateUser(
+            @PathVariable Integer id,
+            @RequestBody User user
+    ){
+        User userUpdating = userService.findUserById(id);
+        userUpdating.setFirstName(user.getFirstName());
+        userUpdating.setLastName(user.getLastName());
+        userUpdating.setEmail(user.getEmail());
+        userUpdating.setPhone(user.getPhone());
+        userUpdating.setAvatar(user.getAvatar());
+        User userUpdated = userService.save(userUpdating);
+        return new ResponseEntity<>(userUpdated, HttpStatus.OK);
     }
 //    DELETE
     @DeleteMapping("{id}")

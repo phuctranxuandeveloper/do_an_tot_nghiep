@@ -1,5 +1,6 @@
 package com.phuc158965.do_an_tot_nghiep.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.sql.Date;
@@ -24,9 +25,11 @@ public class Song {
     private String describe;
     @Column(name = "url_music")
     private String urlMusic;
+    @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "songid")
     private List<Comment> comments;
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY,
             cascade = {CascadeType.DETACH, CascadeType.MERGE,
                     CascadeType.PERSIST, CascadeType.REFRESH})
@@ -51,6 +54,7 @@ public class Song {
                 inverseJoinColumns = @JoinColumn(name = "genreid")
     )
     private List<Genre> genres;
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY,
             cascade = {CascadeType.DETACH, CascadeType.MERGE,
                     CascadeType.PERSIST, CascadeType.REFRESH})

@@ -1,5 +1,6 @@
 package com.phuc158965.do_an_tot_nghiep.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -14,6 +15,7 @@ public class Artist {
     private String nameArtist;
     @Column(name = "avatar")
     private String avatar;
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY,
             cascade = {CascadeType.DETACH, CascadeType.MERGE,
                     CascadeType.PERSIST, CascadeType.REFRESH})
@@ -21,6 +23,7 @@ public class Artist {
             joinColumns = @JoinColumn(name = "artistid"),
             inverseJoinColumns = @JoinColumn(name = "songid"))
     private List<Song> songs;
+    @JsonIgnore
     @OneToMany(mappedBy = "artist", fetch = FetchType.LAZY)
     private List<Album> albums;
 

@@ -14,7 +14,9 @@ public class Playlist {
     private String namePlaylist;
     @Column(name = "tracks")
     private int track;
-//    private User user;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "userid")
+    private User user;
     @ManyToMany(fetch = FetchType.LAZY,
                     cascade = {CascadeType.DETACH, CascadeType.MERGE,
                     CascadeType.PERSIST, CascadeType.REFRESH})
@@ -56,5 +58,13 @@ public class Playlist {
 
     public void setSongs(List<Song> songs) {
         this.songs = songs;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
