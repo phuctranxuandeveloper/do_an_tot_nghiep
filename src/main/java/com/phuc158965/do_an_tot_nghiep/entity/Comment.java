@@ -14,7 +14,9 @@ public class Comment {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "userid")
     private User user;
-//    private Song song;
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name = "songid")
+    private Song song;
 
     public Comment() {
     }
@@ -41,5 +43,13 @@ public class Comment {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Song getSong() {
+        return song;
+    }
+
+    public void setSong(Song song) {
+        this.song = song;
     }
 }

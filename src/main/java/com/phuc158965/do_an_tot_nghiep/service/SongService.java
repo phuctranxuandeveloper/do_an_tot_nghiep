@@ -8,4 +8,5 @@ public interface SongService {
     Song findSongById(Integer id);
     Song save(Song song);
     void deleteById(Integer id);
+    Page<Song> searchSongByName(String name, int no, int size);
 }

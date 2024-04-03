@@ -26,7 +26,7 @@ public class Song {
     @Column(name = "url_music")
     private String urlMusic;
     @JsonIgnore
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "songid")
     private List<Comment> comments;
     @JsonIgnore
@@ -38,8 +38,8 @@ public class Song {
             inverseJoinColumns = @JoinColumn(name = "albumid"))
     private List<Album> albums;
     @ManyToMany(fetch = FetchType.LAZY,
-                cascade = {CascadeType.DETACH, CascadeType.MERGE,
-                        CascadeType.PERSIST, CascadeType.REFRESH})
+                cascade = {CascadeType.MERGE,
+                        CascadeType.PERSIST})
     @JoinTable(name = "artistsong",
             joinColumns = @JoinColumn(name = "songid"),
             inverseJoinColumns = @JoinColumn(name = "artistid"))

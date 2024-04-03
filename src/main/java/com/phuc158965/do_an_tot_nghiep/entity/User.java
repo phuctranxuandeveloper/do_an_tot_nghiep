@@ -1,5 +1,6 @@
 package com.phuc158965.do_an_tot_nghiep.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -34,6 +35,9 @@ public class User {
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
     private List<Comment> comments;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private Favorist favorist;
 
     public User() {
     }
@@ -108,5 +112,13 @@ public class User {
 
     public void setComments(List<Comment> comments) {
         this.comments = comments;
+    }
+
+    public Favorist getFavorist() {
+        return favorist;
+    }
+
+    public void setFavorist(Favorist favorist) {
+        this.favorist = favorist;
     }
 }

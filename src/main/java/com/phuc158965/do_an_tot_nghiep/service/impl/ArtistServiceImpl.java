@@ -36,4 +36,11 @@ public class ArtistServiceImpl implements ArtistService {
     public void deleteById(Integer id) {
         artistRepository.deleteById(id);
     }
+
+    @Override
+    public Page<Artist> searchArtistByName(String name, int no, int size) {
+        Pageable pageable = PageRequest.of(no, size);
+        Page<Artist> artists = artistRepository.findArtistByNameArtistContaining(pageable, name);
+        return artists;
+    }
 }

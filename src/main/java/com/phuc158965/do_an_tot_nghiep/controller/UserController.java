@@ -3,6 +3,7 @@ package com.phuc158965.do_an_tot_nghiep.controller;
 import com.phuc158965.do_an_tot_nghiep.dto.UserDTO;
 import com.phuc158965.do_an_tot_nghiep.entity.Account;
 import com.phuc158965.do_an_tot_nghiep.entity.Playlist;
+import com.phuc158965.do_an_tot_nghiep.entity.Song;
 import com.phuc158965.do_an_tot_nghiep.entity.User;
 import com.phuc158965.do_an_tot_nghiep.mapper.UserMapper;
 import com.phuc158965.do_an_tot_nghiep.service.UserService;
@@ -53,6 +54,7 @@ public class UserController {
         rs.add(linkTo(UserController.class).slash(id).withSelfRel());
         rs.add(linkTo(methodOn(UserController.class).getAccountByUserId(id)).withRel("accounts"));
         rs.add(linkTo(methodOn(UserController.class).getPlaylistByUserId(id)).withRel("playlists"));
+        rs.add(linkTo(methodOn(UserController.class).getFavoristByUserId(id)).withRel("favorist"));
         return new ResponseEntity<>(rs, HttpStatus.OK);
     }
 
@@ -68,6 +70,13 @@ public class UserController {
         User user = userService.findUserById(id);
         List<Playlist> playlists = user.getPlaylists();
         return new ResponseEntity<>(playlists, HttpStatus.OK);
+    }
+
+    @GetMapping("{id}/favorists")
+    public ResponseEntity<?> getFavoristByUserId(@PathVariable Integer id){
+        User user = userService.findUserById(id);
+        List<Song> songs = user.getFavorist().getSongs();
+        return new ResponseEntity<>(songs, HttpStatus.OK);
     }
 
 //    Add
@@ -89,6 +98,7 @@ public class UserController {
         User userCreated = userService.save(userCreating);
         return new ResponseEntity<>(userCreated, HttpStatus.CREATED);
     }
+//    Update
     @PutMapping("{id}")
     public ResponseEntity<?> updateUser(
             @PathVariable Integer id,

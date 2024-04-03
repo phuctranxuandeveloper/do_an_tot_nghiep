@@ -36,4 +36,11 @@ public class AlbumServiceImpl implements AlbumService {
     public void deleteById(Integer id) {
         albumRepository.deleteById(id);
     }
+
+    @Override
+    public Page<Album> searchAlbumByName(String name, int no, int size) {
+        Pageable pageable = PageRequest.of(no, size);
+        Page<Album> albums = albumRepository.findAlbumByNameAlbumContaining(pageable, name);
+        return albums;
+    }
 }

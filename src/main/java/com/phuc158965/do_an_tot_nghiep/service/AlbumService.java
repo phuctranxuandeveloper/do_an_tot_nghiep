@@ -9,4 +9,5 @@ public interface AlbumService {
     Album findAlbumById(Integer id);
     Album save(Album user);
     void deleteById(Integer id);
+    Page<Album> searchAlbumByName(String name, int no, int size);
 }

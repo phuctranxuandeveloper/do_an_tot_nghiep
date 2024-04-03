@@ -17,8 +17,8 @@ public class Artist {
     private String avatar;
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {CascadeType.DETACH, CascadeType.MERGE,
-                    CascadeType.PERSIST, CascadeType.REFRESH})
+            cascade = {CascadeType.MERGE,
+                    CascadeType.PERSIST})
     @JoinTable(name = "artistsong",
             joinColumns = @JoinColumn(name = "artistid"),
             inverseJoinColumns = @JoinColumn(name = "songid"))

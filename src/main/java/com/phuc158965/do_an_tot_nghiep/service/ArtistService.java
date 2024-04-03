@@ -8,4 +8,5 @@ public interface ArtistService {
     Artist findArtistById(Integer id);
     Artist save(Artist user);
     void deleteById(Integer id);
+    Page<Artist> searchArtistByName(String name, int no, int size);
 }

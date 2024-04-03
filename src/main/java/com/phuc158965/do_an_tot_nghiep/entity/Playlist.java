@@ -14,7 +14,7 @@ public class Playlist {
     private String namePlaylist;
     @Column(name = "tracks")
     private int track;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "userid")
     private User user;
     @ManyToMany(fetch = FetchType.LAZY,

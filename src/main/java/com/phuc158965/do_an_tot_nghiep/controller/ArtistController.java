@@ -61,4 +61,44 @@ public class ArtistController {
         List<Album> albums = artist.getAlbums();
         return new ResponseEntity<>(albums, HttpStatus.OK);
     }
+    @PostMapping
+    public ResponseEntity<?> createArtist(@RequestBody Artist artist){
+        Artist artistCreating = new Artist();
+        artistCreating.setId(0);
+        artistCreating.setNameArtist(artist.getNameArtist());
+        artistCreating.setAvatar(artist.getAvatar());
+        Artist artistCreated = artistService.save(artistCreating);
+        return new ResponseEntity<>(artistCreated, HttpStatus.CREATED);
+    }
+    @PutMapping("{id}")
+    public ResponseEntity<?> updateArtist(@PathVariable Integer id,
+                                          @RequestBody Artist artist){
+        Artist artistUpdating = artistService.findArtistById(id);
+        artistUpdating.setNameArtist(artist.getNameArtist());
+        artistUpdating.setAvatar(artist.getAvatar());
+        Artist artistUpdated = artistService.save(artistUpdating);
+        return new ResponseEntity<>(artistUpdated, HttpStatus.OK);
+    }
+    @DeleteMapping("{id}")
+    public ResponseEntity<?> deleteArtist(@PathVariable Integer id){
+        artistService.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("search")
+    public ResponseEntity<?> searchArtistByName(
+            @RequestParam String query,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            PagedResourcesAssembler<Artist> assemble
+    ){
+        Page<Artist> artists = artistService.searchArtistByName(query, page, size);
+        PagedModel<EntityModel<Artist>> artistPageModel = assemble.toModel(
+                artists,
+                artist -> EntityModel.of(artist,
+                        linkTo(methodOn(ArtistController.class).getArtistById(artist.getId())).withSelfRel(),
+                        linkTo(methodOn(ArtistController.class).getSongByArtist(artist.getId())).withRel("songs"),
+                        linkTo(methodOn(ArtistController.class).getAlbumByArtist(artist.getId())).withRel("albums")));
+        return new ResponseEntity<>(artistPageModel, HttpStatus.OK);
+    }
 }

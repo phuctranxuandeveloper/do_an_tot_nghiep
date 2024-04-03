@@ -52,4 +52,27 @@ public class GenreController {
         List<Song> songs = genre.getSongs();
         return new ResponseEntity<>(songs, HttpStatus.OK);
     }
+    @PostMapping
+    public ResponseEntity<?> createGenre(@RequestBody Genre genre){
+        Genre genreCreating = new Genre();
+        genreCreating.setId(0);
+        genreCreating.setNameGenre(genre.getNameGenre());
+        Genre genreCreated = genreService.save(genreCreating);
+        return new ResponseEntity<>(genreCreated, HttpStatus.OK);
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<?> createGenre(
+            @PathVariable Integer id,
+            @RequestBody Genre genre){
+        Genre genreUpdating = genreService.findGenreById(id);
+        genreUpdating.setNameGenre(genre.getNameGenre());
+        Genre genreUpdated = genreService.save(genreUpdating);
+        return new ResponseEntity<>(genreUpdated, HttpStatus.OK);
+    }
+    @DeleteMapping("{id}")
+    public ResponseEntity<?> deleteGenreById(@PathVariable Integer id){
+        genreService.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
