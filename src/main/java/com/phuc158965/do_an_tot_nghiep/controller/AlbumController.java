@@ -5,6 +5,7 @@ import com.phuc158965.do_an_tot_nghiep.entity.Artist;
 import com.phuc158965.do_an_tot_nghiep.entity.Song;
 import com.phuc158965.do_an_tot_nghiep.service.AlbumService;
 import com.phuc158965.do_an_tot_nghiep.service.ArtistService;
+import com.phuc158965.do_an_tot_nghiep.service.SongService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -27,6 +28,8 @@ public class AlbumController {
     private AlbumService albumService;
     @Autowired
     private ArtistService artistService;
+    @Autowired
+    private SongService songService;
     @GetMapping
     public ResponseEntity<?> getAllAlbum(
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -73,7 +76,12 @@ public class AlbumController {
         Artist artistUpdating = artistService.findArtistById(album.getArtist().getId());
         albumCreating.setArtist(artistUpdating);
         albumCreating.setTrack(0);
-        albumCreating.setSongs(new ArrayList<>());
+        List<Song> listSongCreating = new ArrayList<>();
+        for (Song song : album.getSongs()){
+            Song songCreating = songService.findSongById(song.getId());
+            listSongCreating.add(songCreating);
+        }
+        albumCreating.setSongs(listSongCreating);
         albumCreating.setReleaseDate(album.getReleaseDate());
         Album albumCreated = albumService.save(albumCreating);
         return new ResponseEntity<>(albumCreated, HttpStatus.CREATED);
@@ -90,6 +98,12 @@ public class AlbumController {
         Artist artistUpdating = artistService.findArtistById(album.getArtist().getId());
         albumUpdating.setArtist(artistUpdating);
         albumUpdating.setReleaseDate(album.getReleaseDate());
+        List<Song> listSongUpdating = new ArrayList<>();
+        for (Song song : album.getSongs()){
+            Song songUpdating = songService.findSongById(song.getId());
+            listSongUpdating.add(songUpdating);
+        }
+        albumUpdating.setSongs(listSongUpdating);
         Album albumUpdated = albumService.save(albumUpdating);
         return new ResponseEntity<>(albumUpdated, HttpStatus.OK);
     }

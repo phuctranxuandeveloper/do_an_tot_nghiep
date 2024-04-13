@@ -6,18 +6,19 @@ import com.phuc158965.do_an_tot_nghiep.repository.AccountRepository;
 import com.phuc158965.do_an_tot_nghiep.repository.UserRepository;
 import com.phuc158965.do_an_tot_nghiep.service.UserService;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private AccountRepository accountRepository;
     @Override
     public Page<User> findAllUser(int no, int size) {
         Pageable pageable = PageRequest.of(no, size);
@@ -35,6 +36,13 @@ public class UserServiceImpl implements UserService {
     public User save(User user) {
         return userRepository.save(user);
     }
+
+    @Override
+    public UserDetailsService userDetailsService() {
+        return username -> userRepository.findUserByAccount_Username(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
     @Transactional
     @Override
     public void deleteById(Integer id) {

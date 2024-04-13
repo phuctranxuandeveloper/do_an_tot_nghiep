@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "accounts")
 public class Account {
@@ -20,6 +22,9 @@ public class Account {
     @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
     @JsonBackReference
     private User user;
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Role> roles;
 
     public Account() {
     }
@@ -62,5 +67,13 @@ public class Account {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
     }
 }
