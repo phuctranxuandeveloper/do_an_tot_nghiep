@@ -9,4 +9,6 @@ public interface PlaylistService {
     Playlist findPlaylistById(Integer id);
     Playlist save(Playlist user);
     void deleteById(Integer id);
+    Page<Playlist> findPlaylistByUserId(String token, int no, int size);
+    Playlist createPlaylist(String token, Playlist playlist);
 }

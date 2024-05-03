@@ -117,6 +117,38 @@ public class UserController {
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteUserById(@PathVariable Integer id){
         userService.deleteById(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>("Delete user with id:"+id+" successfully!",HttpStatus.OK);
+    }
+    @GetMapping("{id}/active")
+    public ResponseEntity<?> enableUserById(@PathVariable Integer id){
+        User user = userService.enableUser(id);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+    @GetMapping("token/{token}")
+    public ResponseEntity<?> getUserByToken(@PathVariable String token){
+        User user = userService.getUserByToken(token);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+    @GetMapping("not_active")
+    public ResponseEntity<?> getUserNotActive(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            PagedResourcesAssembler<UserDTO> assembler
+    ){
+        Page<User> users = userService.findUserByNotActive(page, size);
+        Page<UserDTO> userDTOS = users.map(user -> {
+            return UserMapper.INSTANCE.userToUserDTO(user);
+        });
+        PagedModel<EntityModel<UserDTO>> userPagedModel = assembler.toModel(userDTOS, user ->
+                EntityModel.of(user,
+                        WebMvcLinkBuilder.linkTo(methodOn(UserController.class).getUserById(user.getId())).withSelfRel(),
+                        WebMvcLinkBuilder.linkTo(methodOn(UserController.class).getAccountByUserId(user.getId())).withRel("accounts"),
+                        WebMvcLinkBuilder.linkTo(methodOn(UserController.class).getPlaylistByUserId(user.getId())).withRel("playlist")));
+        return new ResponseEntity<>(userPagedModel, HttpStatus.OK);
+    }
+    @PutMapping("token/{token}")
+    public ResponseEntity<?> updateUserByToken(@PathVariable String token, @RequestBody User user){
+        User userUpdated = userService.updateUserByToken(token, user);
+        return new ResponseEntity<>(userUpdated, HttpStatus.OK);
     }
 }

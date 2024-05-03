@@ -61,6 +61,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         list.add(role_default);
         Account accountUpdating = accountRepository.findById(accountCreated.getId()).orElseThrow(() -> new EntityNotFoundException("Account creating not found!"));
         accountUpdating.setRoles(list);
+        if(list.stream().anyMatch(role -> role.getRole().equals("ROLE_CUSTOMER"))){
+            accountUpdating.setActive(true);
+        }
+        else {
+            accountUpdating.setActive(false);
+        }
         Account accountUpdated = accountRepository.save(accountUpdating);
         userCreating.setAccount(accountUpdated);
         User userCreated = userRepository.save(userCreating);
@@ -77,7 +83,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         JwtAuthenticationResponse jwtAuthenticationResponse = new JwtAuthenticationResponse();
         jwtAuthenticationResponse.setToken(token);
         jwtAuthenticationResponse.setRefreshToken(refreshToken);
-
+        jwtAuthenticationResponse.setRoles(user.getAuthorities());
         return jwtAuthenticationResponse;
     }
 }

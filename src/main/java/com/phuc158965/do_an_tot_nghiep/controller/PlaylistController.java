@@ -30,12 +30,13 @@ public class PlaylistController {
     private UserService userService;
     @Autowired
     private SongService songService;
+
     @GetMapping
     public ResponseEntity<?> getAllPlaylist(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
             PagedResourcesAssembler<Playlist> assembler
-    ){
+    ) {
         Page<Playlist> playlists = playlistService.findAllPlaylist(page, size);
         PagedModel<EntityModel<Playlist>> playlistPageModel = assembler
                 .toModel(playlists, playlist -> EntityModel.of(playlist,
@@ -45,8 +46,9 @@ public class PlaylistController {
                 ));
         return new ResponseEntity<>(playlistPageModel, HttpStatus.OK);
     }
+
     @GetMapping("{id}")
-    public ResponseEntity<?> getPlaylistById(@PathVariable Integer id){
+    public ResponseEntity<?> getPlaylistById(@PathVariable Integer id) {
         Playlist playlist = playlistService.findPlaylistById(id);
         EntityModel<Playlist> playlistEntityModel = EntityModel.of(playlist);
         playlistEntityModel.add(linkTo(methodOn(PlaylistController.class).getPlaylistById(playlist.getId())).withSelfRel());
@@ -56,20 +58,22 @@ public class PlaylistController {
     }
 
     @GetMapping("{id}/songs")
-    public ResponseEntity<?> getSongByPlaylist(@PathVariable Integer id){
+    public ResponseEntity<?> getSongByPlaylist(@PathVariable Integer id) {
         Playlist playlist = playlistService.findPlaylistById(id);
         List<Song> songs = playlist.getSongs();
         return new ResponseEntity<>(songs, HttpStatus.OK);
     }
+
     @GetMapping("{id}/users")
-    public ResponseEntity<?> getUserByPlaylist(@PathVariable Integer id){
+    public ResponseEntity<?> getUserByPlaylist(@PathVariable Integer id) {
         Playlist playlist = playlistService.findPlaylistById(id);
         User user = playlist.getUser();
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
+
     @PostMapping
     public ResponseEntity<?> createPlaylist(@RequestParam Integer userId,
-                                            @RequestBody Playlist playlist){
+                                            @RequestBody Playlist playlist) {
         User userCreatPlaylist = userService.findUserById(userId);
         Playlist playlistCreating = new Playlist();
         playlistCreating.setId(0);
@@ -80,13 +84,14 @@ public class PlaylistController {
         Playlist playlistCreated = playlistService.save(playlistCreating);
         return new ResponseEntity<>(playlistCreated, HttpStatus.CREATED);
     }
+
     @GetMapping("{id}/addSong")
     public ResponseEntity<?> addSongToPlaylist(@RequestParam(value = "songId", defaultValue = "0") Integer songId,
-                                               @PathVariable Integer id){
+                                               @PathVariable Integer id) {
         Playlist playlistUpdating = playlistService.findPlaylistById(id);
         Song songBeAdded = songService.findSongById(songId);
         List<Song> listSongUpdating = playlistUpdating.getSongs();
-        if (listSongUpdating.contains(songBeAdded)){
+        if (listSongUpdating.contains(songBeAdded)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("song already exists in playlist");
         }
         listSongUpdating.add(songBeAdded);
@@ -97,7 +102,7 @@ public class PlaylistController {
 
     @PostMapping("{id}/removeSong")
     public ResponseEntity<?> removeSongToPlaylist(@RequestParam(value = "songId", defaultValue = "0") Integer songId,
-                                               @PathVariable Integer id){
+                                                  @PathVariable Integer id) {
         Playlist playlistUpdating = playlistService.findPlaylistById(id);
         Song songBeAdded = songService.findSongById(songId);
         List<Song> listSongUpdating = playlistUpdating.getSongs();
@@ -109,7 +114,7 @@ public class PlaylistController {
 
     @PutMapping("{id}")
     public ResponseEntity<?> updatePlaylist(@RequestBody Playlist playlist,
-                                            @PathVariable Integer id){
+                                            @PathVariable Integer id) {
         Playlist playlistUpdating = playlistService.findPlaylistById(id);
         playlistUpdating.setNamePlaylist(playlist.getNamePlaylist());
         Playlist playlistUpdated = playlistService.save(playlistUpdating);
@@ -118,8 +123,30 @@ public class PlaylistController {
 
 
     @DeleteMapping("{id}")
-    public ResponseEntity<?> deletePlaylist(@PathVariable Integer id){
+    public ResponseEntity<?> deletePlaylist(@PathVariable Integer id) {
         playlistService.deleteById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PostMapping("create/{token}")
+    public ResponseEntity<?> createPlaylistWithToken(@RequestBody Playlist playlist, @PathVariable String token) {
+        Playlist playlistCreated = playlistService.createPlaylist(token, playlist);
+        return new ResponseEntity<>(playlistCreated, HttpStatus.OK);
+    }
+    @GetMapping("find/{token}")
+    public ResponseEntity<?> findAllPlaylistByToken(
+            @PathVariable String token,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            PagedResourcesAssembler<Playlist> assembler) {
+        Page<Playlist> playlists = playlistService.findPlaylistByUserId(token, page, size);
+        PagedModel<EntityModel<Playlist>> playlistPageModel = assembler
+                .toModel(playlists, playlist -> EntityModel.of(playlist,
+                        linkTo(methodOn(PlaylistController.class).getPlaylistById(playlist.getId())).withSelfRel(),
+                        linkTo(methodOn(PlaylistController.class).getSongByPlaylist(playlist.getId())).withRel("songs"),
+                        linkTo(methodOn(PlaylistController.class).getUserByPlaylist(playlist.getId())).withRel("users")
+                ));
+        return new ResponseEntity<>(playlistPageModel, HttpStatus.OK);
+    }
+
 }

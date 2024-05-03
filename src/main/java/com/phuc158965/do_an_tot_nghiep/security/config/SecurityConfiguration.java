@@ -27,10 +27,10 @@ public class SecurityConfiguration {
     @Autowired
     private UserService userService;
 
-    private static final String[] WHITE_LIST_URL = {"/api/auth/**"};
-    private static final String[] ROLE_ALL = {"ROLE_ADMIN", "ROLE_CUSTOMER"};
+    private static final String[] WHITE_LIST_URL = {"/api/auth/**", "/api/users/**", "/api/accounts/**"};
+    private static final String[] ROLE_ALL = {"ROLE_ADMIN", "ROLE_CUSTOMER", "ROLE_MANAGER"};
     private static final String[] ROLE_ADMIN = {"ROLE_ADMIN"};
-    private static final String[] ROLE_MANAGER = {"ROLE_MANAGER"};
+    private static final String[] ROLE_MANAGER = {"ROLE_MANAGER", "ROLE_ADMIN"};
     private static final String[] ROLE_CUSTOMER = {"ROLE_CUSTOMER"};
 
     @Bean
@@ -44,17 +44,19 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.GET, "/api/artists/**").hasAnyAuthority(ROLE_ALL)
                                 .requestMatchers(HttpMethod.GET, "/api/albums/**").hasAnyAuthority(ROLE_ALL)
                                 .requestMatchers(HttpMethod.GET, "/api/playlists/**").hasAnyAuthority(ROLE_CUSTOMER)
-                                .requestMatchers(HttpMethod.POST, "/api/songs/**").hasAnyAuthority(ROLE_ADMIN)
-                                .requestMatchers(HttpMethod.POST, "/api/artists/**").hasAnyAuthority(ROLE_ADMIN)
-                                .requestMatchers(HttpMethod.POST, "/api/albums/**").hasAnyAuthority(ROLE_ADMIN)
+                                .requestMatchers(HttpMethod.GET, "/api/favorists/**").hasAnyAuthority(ROLE_ALL)
+                                .requestMatchers(HttpMethod.POST, "/api/songs/**").hasAnyAuthority(ROLE_MANAGER)
+                                .requestMatchers(HttpMethod.POST, "/api/artists/**").hasAnyAuthority(ROLE_MANAGER)
+                                .requestMatchers(HttpMethod.POST, "/api/albums/**").hasAnyAuthority(ROLE_MANAGER)
                                 .requestMatchers(HttpMethod.POST, "/api/playlists/**").hasAnyAuthority(ROLE_CUSTOMER)
-                                .requestMatchers(HttpMethod.PUT, "/api/songs/**").hasAnyAuthority(ROLE_ADMIN)
-                                .requestMatchers(HttpMethod.PUT, "/api/artists/**").hasAnyAuthority(ROLE_ADMIN)
-                                .requestMatchers(HttpMethod.PUT, "/api/albums/**").hasAnyAuthority(ROLE_ADMIN)
+                                .requestMatchers(HttpMethod.PUT, "/api/songs/**").hasAnyAuthority(ROLE_MANAGER)
+                                .requestMatchers(HttpMethod.PUT, "/api/artists/**").hasAnyAuthority(ROLE_MANAGER)
+                                .requestMatchers(HttpMethod.PUT, "/api/albums/**").hasAnyAuthority(ROLE_MANAGER)
                                 .requestMatchers(HttpMethod.PUT, "/api/playlists/**").hasAnyAuthority(ROLE_CUSTOMER)
-                                .requestMatchers(HttpMethod.DELETE, "/api/songs/**").hasAnyAuthority(ROLE_MANAGER)
-                                .requestMatchers(HttpMethod.DELETE, "/api/artists/**").hasAnyAuthority(ROLE_MANAGER)
-                                .requestMatchers(HttpMethod.DELETE, "/api/albums/**").hasAnyAuthority(ROLE_MANAGER)
+                                .requestMatchers(HttpMethod.PUT, "/api/users/**").hasAnyAuthority(ROLE_CUSTOMER)
+                                .requestMatchers(HttpMethod.DELETE, "/api/songs/**").hasAnyAuthority(ROLE_ADMIN)
+                                .requestMatchers(HttpMethod.DELETE, "/api/artists/**").hasAnyAuthority(ROLE_ADMIN)
+                                .requestMatchers(HttpMethod.DELETE, "/api/albums/**").hasAnyAuthority(ROLE_ADMIN)
                                 .requestMatchers(HttpMethod.DELETE, "/api/playlists/**").hasAnyAuthority(ROLE_CUSTOMER)
 
                         .anyRequest().authenticated()

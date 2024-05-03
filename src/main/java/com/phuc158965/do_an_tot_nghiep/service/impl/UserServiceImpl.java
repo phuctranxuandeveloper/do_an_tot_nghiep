@@ -1,9 +1,11 @@
 package com.phuc158965.do_an_tot_nghiep.service.impl;
 
+import com.phuc158965.do_an_tot_nghiep.entity.Account;
 import com.phuc158965.do_an_tot_nghiep.entity.User;
 import com.phuc158965.do_an_tot_nghiep.exception.EntityNotFoundException;
 import com.phuc158965.do_an_tot_nghiep.repository.AccountRepository;
 import com.phuc158965.do_an_tot_nghiep.repository.UserRepository;
+import com.phuc158965.do_an_tot_nghiep.security.config.JwtService;
 import com.phuc158965.do_an_tot_nghiep.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +17,16 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private AccountRepository accountRepository;
+    @Autowired
+    private JwtService jwtService;
     @Override
     public Page<User> findAllUser(int no, int size) {
         Pageable pageable = PageRequest.of(no, size);
@@ -53,5 +61,45 @@ public class UserServiceImpl implements UserService {
 //            userDelete.setAccount(null);
 //        }
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public User enableUser(Integer id) {
+        User userUpdating = userRepository.findUserByUserId(id)
+                .orElseThrow(() -> new EntityNotFoundException("Not found user with "+ id));
+        Account accountUpdating = accountRepository.findById(userUpdating.getAccount().getId())
+                .orElseThrow(() -> new EntityNotFoundException("Not found account !"));
+        accountUpdating.setActive(true);
+        Account accountUpdated = accountRepository.save(accountUpdating);
+        userUpdating.setAccount(accountUpdated);
+        User userUpdated = userRepository.save(userUpdating);
+        return userUpdated;
+    }
+
+    @Override
+    public User getUserByToken(String token) {
+        String username = jwtService.extractUsername(token);
+        User user = userRepository.findUserByAccount_Username(username)
+                .orElseThrow(() -> new EntityNotFoundException("Not found user!"));
+        return user;
+    }
+
+    @Override
+    public Page<User> findUserByNotActive(int no, int size) {
+        Pageable pageable = PageRequest.of(no, size);
+        Page<User> users = userRepository.findUserByAccount_Active(false, pageable);
+        return users;
+    }
+
+    @Override
+    public User updateUserByToken(String token, User user) {
+        User userUpdating = getUserByToken(token);
+        userUpdating.setFirstName(user.getFirstName());
+        userUpdating.setLastName(user.getLastName());
+        userUpdating.setPhone(user.getPhone());
+        userUpdating.setAvatar(user.getAvatar());
+        userUpdating.setEmail(user.getEmail());
+        User userUpdated = userRepository.save(userUpdating);
+        return userUpdated;
     }
 }

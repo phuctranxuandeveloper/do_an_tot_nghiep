@@ -82,45 +82,32 @@ public class FavoristController {
         Favorist favoristCreated = favoristService.save(favoristCreating);
         return new ResponseEntity<>(favoristCreated, HttpStatus.CREATED);
     }
-    @GetMapping("{id}/addSong")
+    @GetMapping("{token}/addSong")
     public ResponseEntity<?> addSongToFavorist(@RequestParam(value = "songId", defaultValue = "0") Integer songId,
-                                               @PathVariable Integer id){
-        Favorist favoristUpdating = favoristService.findFavoristByUserId(id);
-        Song songBeAdded = songService.findSongById(songId);
-        List<Song> listSongUpdating = favoristUpdating.getSongs();
-        if (listSongUpdating.contains(songBeAdded)){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("song already exists in my favorist");
-        }
-        listSongUpdating.add(songBeAdded);
-        favoristUpdating.setSongs(listSongUpdating);
-        Favorist favoristUpdated = favoristService.save(favoristUpdating);
+                                               @PathVariable String token){
+        Favorist favoristUpdated = favoristService.addSongToFavorist(token, songId);
         return new ResponseEntity<>(favoristUpdated, HttpStatus.CREATED);
     }
 
-    @GetMapping("{id}/removeSong")
+    @GetMapping("{token}/removeSong")
     public ResponseEntity<?> removeSongToFavorist(@RequestParam(value = "songId", defaultValue = "0") Integer songId,
-                                                  @PathVariable Integer id){
-        Favorist favoristUpdating = favoristService.findFavoristByUserId(id);
-        Song songBeRemove = songService.findSongById(songId);
-        List<Song> listSongUpdating = favoristUpdating.getSongs();
-        if (!listSongUpdating.contains(songBeRemove)){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Not found song in my favorist!");
-        }
-        listSongUpdating.remove(songBeRemove);
-        favoristUpdating.setSongs(listSongUpdating);
-        Favorist favoristUpdated = favoristService.save(favoristUpdating);
+                                                  @PathVariable String token){
+        Favorist favoristUpdated = favoristService.removeSongToFavorist(token, songId);
         return new ResponseEntity<>(favoristUpdated, HttpStatus.CREATED);
     }
 
-    @GetMapping("{id}/checkSong")
+    @GetMapping("{token}/checkSong")
     public ResponseEntity<?> checkSongToFavorist(@RequestParam(value = "songId", defaultValue = "0") Integer songId,
-                                                  @PathVariable Integer id){
-        Favorist favoristChecking = favoristService.findFavoristByUserId(id);
-        Song songChecking = songService.findSongById(songId);
-        List<Song> listSongChecking = favoristChecking.getSongs();
-        if (!listSongChecking.contains(songChecking)){
+                                                  @PathVariable String token){
+        Boolean check = favoristService.checkSongToFavorist(token, songId);
+        if (!check){
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Not found song in my favorist!");
         }
         return ResponseEntity.status(HttpStatus.OK).body("Song is in my favorist!");
+    }
+    @GetMapping("{token}/list_songs")
+    public ResponseEntity<?> getListSongInFavorist(@PathVariable String token){
+        List<Song> songs = favoristService.getSongToFavorist(token);
+        return new ResponseEntity<>(songs, HttpStatus.OK);
     }
 }

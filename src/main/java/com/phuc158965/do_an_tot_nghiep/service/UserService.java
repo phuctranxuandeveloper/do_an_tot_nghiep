@@ -12,4 +12,8 @@ public interface UserService {
     User save(User user);
     UserDetailsService userDetailsService();
     void deleteById(Integer id);
+    User enableUser(Integer id);
+    User getUserByToken(String token);
+    Page<User> findUserByNotActive(int no, int size);
+    User updateUserByToken(String token, User user);
 }
